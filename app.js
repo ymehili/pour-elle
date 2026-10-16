@@ -178,7 +178,7 @@
     }), { rootMargin: '-50% 0px -50% 0px' });
     $$('[data-theme]').forEach(s => ioTheme.observe(s));
 
-    $$('.ch.night, .pano.lune .pano-stick').forEach(sec => { const f = document.createElement('div'); f.className = 'starfield'; sprinkle(f, 45); sec.prepend(f); });
+    $$('.ch.night').forEach(sec => { const f = document.createElement('div'); f.className = 'starfield'; sprinkle(f, 45); sec.prepend(f); });
     since(); setInterval(since, 1000);
     clocks(); setInterval(clocks, 10000);
     march();
@@ -311,9 +311,11 @@
     const ps = $$('[data-pano]');
     const bleeds = $$('.bleed .full .ph-i, .hero .full .ph-i');
     let ticking = false;
+    const prog = document.getElementById('prog');
     const run = () => {
       ticking = false;
       const vh = innerHeight, vw = document.documentElement.clientWidth;
+      if (prog) prog.style.transform = `scaleX(${Math.min(1, scrollY / (document.documentElement.scrollHeight - vh))})`;
       for (const p of ps) {
         const r = p.getBoundingClientRect();
         if (r.bottom < -50 || r.top > vh + 50) continue;
