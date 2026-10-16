@@ -11,16 +11,24 @@
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   /* ---------------- étoiles ---------------- */
-  const stars = $('.stars');
-  for (let i = 0; i < 70; i++) {
-    const s = document.createElement('i');
-    if (Math.random() < .55) s.className = 's';
-    s.style.left = (Math.random() * 100).toFixed(2) + '%';
-    s.style.top = (Math.random() * 100).toFixed(2) + '%';
-    s.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
-    s.style.animationDuration = (3 + Math.random() * 4).toFixed(2) + 's';
-    stars.appendChild(s);
+  function sprinkle(box, n) {
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('i');
+      if (Math.random() < .55) s.className = 's';
+      s.style.left = (Math.random() * 100).toFixed(2) + '%';
+      s.style.top = (Math.random() * 100).toFixed(2) + '%';
+      s.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+      s.style.animationDuration = (3 + Math.random() * 4).toFixed(2) + 's';
+      box.appendChild(s);
+    }
   }
+  sprinkle($('.stars'), 70);
+  const shooter = document.createElement('i'); shooter.className = 'shoot'; $('.sky').appendChild(shooter);
+  const shootTimer = setInterval(() => {
+    if (!document.body.classList.contains('locked')) return clearInterval(shootTimer);
+    shooter.style.top = (8 + Math.random() * 22) + '%';
+    shooter.classList.remove('go'); void shooter.offsetWidth; shooter.classList.add('go');
+  }, 5200);
 
   /* ---------------- clé du lien ---------------- */
   const frag = new URLSearchParams(location.hash.slice(1)).get('k');
@@ -49,10 +57,10 @@
   /* ---------------- clavier ---------------- */
   let digits = '', busy = false, fails = 0;
   const hints = [
-    'Entre la date du jour où tout a commencé',
-    'Presque… le jour où on a commencé à se parler ♡',
-    'Un jour de novembre 2025…',
-    'Le tout premier jour de novembre 2025 😌'
+    'entre la date du jour où tout a commencé',
+    'presque… le jour où on a commencé à se parler ♡',
+    'un jour de novembre 2025, réfléchis bien',
+    'le tout premier jour de novembre 2025, allez'
   ];
   const dots = $$('i', slots);
   const paint = () => dots.forEach((d, i) => d.classList.toggle('f', i < digits.length));
@@ -170,6 +178,7 @@
     }), { rootMargin: '-50% 0px -50% 0px' });
     $$('[data-theme]').forEach(s => ioTheme.observe(s));
 
+    $$('.ch.night, .pano.lune .pano-stick').forEach(sec => { const f = document.createElement('div'); f.className = 'starfield'; sprinkle(f, 45); sec.prepend(f); });
     since(); setInterval(since, 1000);
     clocks(); setInterval(clocks, 10000);
     march();
