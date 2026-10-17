@@ -23,7 +23,7 @@
     }
   }
   sprinkle($('.stars'), 70);
-  const shooter = document.createElement('i'); shooter.className = 'shoot'; $('.sky').appendChild(shooter);
+  const shooter = document.createElement('i'); shooter.className = 'shoot'; $('#lock').appendChild(shooter);
   const shootTimer = setInterval(() => {
     if (!document.body.classList.contains('locked')) return clearInterval(shootTimer);
     shooter.style.top = (8 + Math.random() * 22) + '%';
@@ -63,7 +63,7 @@
     'le tout premier jour de novembre 2025, allez'
   ];
   const dots = $$('i', slots);
-  const paint = () => dots.forEach((d, i) => d.classList.toggle('f', i < digits.length));
+  const paint = () => dots.forEach((d, i) => { d.classList.toggle('f', i < digits.length); d.textContent = digits[i] || ''; });
 
   async function submit() {
     busy = true;
@@ -177,8 +177,10 @@
       if (e.isIntersecting) meta.setAttribute('content', e.target.dataset.theme);
     }), { rootMargin: '-50% 0px -50% 0px' });
     $$('[data-theme]').forEach(s => ioTheme.observe(s));
+    const hud = $('[data-hud-ch]');
+    const ioCh = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && hud) hud.textContent = e.target.dataset.ch; }), { rootMargin: '-40% 0px -55% 0px' });
+    $$('[data-ch]').forEach(s => ioCh.observe(s));
 
-    $$('.ch.night').forEach(sec => { const f = document.createElement('div'); f.className = 'starfield'; sprinkle(f, 45); sec.prepend(f); });
     since(); setInterval(since, 1000);
     clocks(); setInterval(clocks, 10000);
     march();
@@ -237,9 +239,7 @@
     const h = Math.floor(s / 3600); s -= h * 3600;
     const m = Math.floor(s / 60); s -= m * 60;
     const p = n => String(n).padStart(2, '0');
-    el.textContent = d >= 365
-      ? `1 an${d > 365 ? ` et ${d - 365} j` : ''} · ${h} h ${p(m)} min ${p(s)} s`
-      : `${d} jours · ${h} h ${p(m)} min ${p(s)} s`;
+    el.textContent = `${d} j · ${p(h)}:${p(m)}:${p(s)}`;
   }
 
   function clocks() {
@@ -257,7 +257,7 @@
     const pp = $('[data-march-pct]'); if (pp) pp.textContent = Math.round(pct) + '\u202f%';
     if (animate) {
       const bar = $('[data-march-bar]'), pl = $('.plane');
-      setTimeout(() => { bar.style.width = pct + '%'; pl.style.left = pct + '%'; }, 250);
+      setTimeout(() => { bar.style.width = pct + '%'; if (pl) pl.style.left = pct + '%'; }, 250);
     }
   }
 

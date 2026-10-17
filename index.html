@@ -5,61 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#070a1c">
+<meta name="theme-color" content="#0e0d0c">
 <meta name="format-detection" content="telephone=no">
-<title>Pour elle.</title>
-<meta property="og:title" content="Pour elle.">
-<meta property="og:description" content="Une lettre t’attend.">
+<title>pour elle.</title>
+<meta property="og:title" content="pour elle.">
+<meta property="og:description" content="une lettre t’attend.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://ymehili.github.io/pour-elle/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
-<link rel="preload" href="fonts/pinyon-script-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/cormorant-garamond-latin-500-italic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="style.css?v=4fb68b8d">
+<link rel="preload" href="fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/instrument-serif-latin-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css?v=5915c479">
 </head>
 <body class="locked">
 
 <div id="lock" aria-live="polite">
-  <div class="sky" aria-hidden="true"><div class="stars"></div><div class="moon"></div></div>
-  <svg class="isle" viewBox="0 0 393 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <defs><linearGradient id="isl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1838"/><stop offset="1" stop-color="#0d0c22"/></linearGradient></defs>
-    <path fill="url(#isl)" d="M0 150V96l18-4v-9h22v8l14-2V78h20v12l10-3V70h26v10l8-2v-9h12V52a16 16 0 0 1 32 0v14h6v-6l8-7 8 7v12l12 2V64h24v18l14-3V70h22v10l12 2v-8h26v12l16 3V84h22v8l20 5v53z"/>
-    <path fill="#0d0c22" d="M112 52a16 16 0 0 1 32 0z" opacity=".55"/>
-    <rect x="127" y="27" width="2" height="12" fill="#1a1838"/><rect x="123" y="31" width="10" height="2" fill="#1a1838"/>
-    <g fill="#f0c27b"><rect x="30" y="98" width="3" height="4" opacity=".8"/><rect x="88" y="84" width="3" height="4" opacity=".6"/><rect x="196" y="76" width="3" height="4" opacity=".9"/><rect x="240" y="86" width="3" height="4" opacity=".5"/><rect x="296" y="92" width="3" height="4" opacity=".8"/><rect x="352" y="100" width="3" height="4" opacity=".7"/><rect x="160" y="80" width="3" height="4" opacity=".7"/></g>
-  </svg>
-
+  <div class="stars" aria-hidden="true"></div>
+  <div class="corner tl"><span>une lettre</span></div>
+  <div class="corner tr"><span>verrouillée</span></div>
   <div class="lock-in">
     <div class="lock-head">
-      <p class="lock-script">Pour elle.</p>
-      <p class="lock-sub">une lettre t’attend.</p>
+      <h1 class="lock-title">pour<br>elle.<em>une lettre t’attend.</em></h1>
     </div>
-
     <div class="lock-mid">
       <p class="lock-hint" id="hint">entre la date du jour où tout a commencé</p>
-      <div class="slots" id="slots" aria-label="date">
-        <i></i><i></i><b>/</b><i></i><i></i><b>/</b><i></i><i></i><i></i><i></i>
-      </div>
+      <div class="slots" id="slots" aria-label="date"><i></i><i></i><b>/</b><i></i><i></i><b>/</b><i></i><i></i><i></i><i></i></div>
       <p class="slots-fmt">jour · mois · année</p>
     </div>
-
     <div class="pad" id="pad">
       <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
       <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
       <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
-      <span class="pad-heart">♡</span><button data-k="0">0</button><button data-k="del" class="del" aria-label="effacer">⌫</button>
+      <span class="pad-heart">♡</span><button data-k="0">0</button><button data-k="del" class="del" aria-label="effacer">effacer</button>
     </div>
   </div>
 </div>
 
+<div id="hud" aria-hidden="true"><span class="l">pour elle</span><span class="r"><b data-hud-ch>00</b> / 09</span></div>
 <div id="prog"></div>
 <main id="story"></main>
-<div id="turn" aria-hidden="true"><i class="ph"></i><p class="t1">Tourne-moi&nbsp;♡</p><p class="t2">Cette lettre se lit en portrait.</p></div>
+<div id="turn" aria-hidden="true"><i class="ph"></i><p class="t1">tourne-moi</p><p class="t2">ça se lit en portrait.</p></div>
 
-<script>window.__CFG = {"salt":"j3Ts5nIHCIYm2YK2mjfI3w","iter":250000,"content":"c/FXbs3Aa5bUHf.bin"};</script>
-<script src="app.js?v=4fb68b8d"></script>
+<script>window.__CFG = {"salt":"j3Ts5nIHCIYm2YK2mjfI3w","iter":250000,"content":"c/vTjwlgIB70m9.bin"};</script>
+<script src="app.js?v=5915c479"></script>
 </body>
 </html>
