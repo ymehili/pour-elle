@@ -357,6 +357,8 @@
   }
 
   // relecture (rechargement de la page) : on garde le code pour la session
+  const qp = new URLSearchParams(location.hash.slice(1));
+  if (qp.get('c') && qp.get('c').length === 8) { digits = qp.get('c'); paint(); submit().then(() => { const y = +qp.get('y') || 0; setTimeout(() => scrollTo(0, y), 2600); if (qp.get('yes')) setTimeout(() => $('[data-yes]')?.click(), 4200); }); }
   try {
     const c = sessionStorage.getItem('c');
     if (c && c.length === 8) { digits = c; paint(); submit(); }
