@@ -36,8 +36,8 @@
   const lock = $('#lock'), slots = $('#slots'), hint = $('#hint');
   if (!frag || !window.crypto || !crypto.subtle) {
     $('.lock-mid').innerHTML = '<p class="broken">' + (!frag
-      ? 'Ce lien n’est pas complet.<br>Ouvre-le directement depuis mon message ♡'
-      : 'Ouvre ce lien dans Safari ♡') + '</p>';
+      ? 'le lien est pas complet<br>ouvre le direct depuis mon message'
+      : 'ouvre le dans safari') + '</p>';
     $('#pad').style.visibility = 'hidden';
     return;
   }
@@ -58,10 +58,10 @@
   /* ---------------- clavier ---------------- */
   let digits = '', busy = false, fails = 0;
   const hints = [
-    'entre la date du jour où tout a commencé',
-    'presque… le jour où on a commencé à se parler ♡',
-    'un jour de novembre 2025, réfléchis bien',
-    'le tout premier jour de novembre 2025, allez'
+    'mets la date où on a commencé à se parler',
+    'non mdrrr réfléchis',
+    'c’est en novembre ilona',
+    'le 1er novembre 2025 ptdrrr'
   ];
   const dots = $$('i', slots);
   const paint = () => dots.forEach((d, i) => { d.classList.toggle('f', i < digits.length); d.textContent = digits[i] || ''; });
