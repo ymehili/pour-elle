@@ -315,3 +315,16 @@ figure.pic figcaption,.pair figcaption{font:600 10px/1.4 var(--sans);letter-spac
   .kb .ph-i img.ok,.ticker div,body::after{animation:none}
 }
 @media (min-width:600px){ html{background:#000} #story{box-shadow:0 0 0 1px rgba(255,255,255,.08)} }
+
+
+#mist{position:absolute;inset:0;width:100%;height:100%;display:block}
+.glh{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;touch-action:pan-y}
+.hero.gl-on .full .ph-i img{opacity:0!important}
+.hero-shade,.hero-txt,.hero .corner{z-index:2}
+.gld-c{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none}
+.gld-c.done{display:none}
+.bleed.gl-on .full .ph-i img{opacity:0;transition:none}
+.bleed.gl-on.gl-done .full .ph-i img{opacity:1}
+.bleed .bleed-shade,.bleed .bleed-txt,.bleed .corner{z-index:2}
+.glstars{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none;mix-blend-mode:screen}
+.fin-shade{z-index:1}.fin-txt,.finale .corner{z-index:2}

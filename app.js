@@ -23,6 +23,7 @@
     }
   }
   sprinkle($('.stars'), 70);
+  let mistFx = null; try { if (window.GL && GL.supported) mistFx = GL.mist($('#mist')); } catch (e) {}
   const shooter = document.createElement('i'); shooter.className = 'shoot'; $('#lock').appendChild(shooter);
   const shootTimer = setInterval(() => {
     if (!document.body.classList.contains('locked')) return clearInterval(shootTimer);
@@ -144,7 +145,7 @@
     document.body.classList.remove('locked');
     scrollTo(0, 0);
     lock.classList.add('gone');
-    setTimeout(() => lock.remove(), 1700);
+    setTimeout(() => { if (mistFx) mistFx.stop(); lock.remove(); }, 1700);
     init(els);
   }
 
@@ -181,6 +182,7 @@
     const ioCh = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && hud) hud.textContent = e.target.dataset.ch; }), { rootMargin: '-40% 0px -55% 0px' });
     $$('[data-ch]').forEach(s => ioCh.observe(s));
 
+    glfx();
     since(); setInterval(since, 1000);
     clocks(); setInterval(clocks, 10000);
     march();
@@ -335,6 +337,23 @@
     addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(run); } }, { passive: true });
     addEventListener('resize', run);
     run();
+  }
+
+  function glfx() {
+    if (!window.GL || !GL.supported) return;
+    // hero liquide
+    const hero = $('.hero'), hc = $('.glh', hero), hi = $('img[data-a]', hero);
+    if (hc && hi) loadEl(hi).then(() => { try { if (GL.liquid(hc, hi)) hero.classList.add('gl-on'); } catch (e) {} });
+    // pleines pages : dissolution au scroll
+    $$('.bleed').forEach(bl => {
+      const fig = $('.gld', bl), im = fig && $('img[data-a]', fig); if (!im) return;
+      const c = document.createElement('canvas'); c.className = 'gld-c'; fig.after(c);
+      let fx = null;
+      loadEl(im).then(() => { try { fx = GL.dissolve(c, im); if (fx) bl.classList.add('gl-on'); } catch (e) {} });
+      new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { const go = () => { if (fx) { fx.reveal(); setTimeout(() => bl.classList.add('gl-done'), 1400); } else setTimeout(go, 200); }; go(); } }), { threshold: .25 }).observe(bl);
+    });
+    // étoiles
+    const sc = $('.glstars'); if (sc) { try { GL.stars(sc); } catch (e) {} }
   }
 
   // relecture (rechargement de la page) : on garde le code pour la session
