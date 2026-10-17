@@ -17,7 +17,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;color:var(--fg);font:400 18px/1.45 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:clip;background:var(--bg)}
-body.locked{overflow:hidden;height:100svh}
+body.locked{overflow:hidden;height:100dvh}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;-webkit-appearance:none;appearance:none;cursor:pointer;touch-action:manipulation;text-align:inherit}
 img,video{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 p{margin:0}
@@ -42,12 +42,12 @@ body:not(.locked) #hud{opacity:1}
   transition:opacity 1s ease,transform 1.4s var(--e)}
 #lock.gone{opacity:0;transform:scale(1.04);pointer-events:none}
 #lock .corner{color:var(--fg2)}
-.lock-in{position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--st) + 54px) var(--gut) calc(var(--sb) + 18px)}
+.lock-in{position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:calc(var(--st) + 40px) var(--gut) calc(var(--sb) + 10px)}
 .lock-head{position:relative}
-.lock-title{font:800 clamp(72px,24vw,96px)/.86 var(--sans);letter-spacing:-.05em;text-transform:lowercase;margin:0}
+.lock-title{font:800 clamp(60px,20vw,84px)/.86 var(--sans);letter-spacing:-.05em;text-transform:lowercase;margin:0}
 .lock-title em{display:block;font:italic 400 .62em/1 var(--serif);letter-spacing:0;margin-top:8px;color:var(--rose)}
-.lock-mid{margin-top:auto;margin-bottom:22px}
-.lock-hint{font:500 12px/1.4 var(--sans);letter-spacing:.02em;color:var(--fg2);margin:0 0 14px;min-height:34px;text-transform:lowercase}
+.lock-mid{margin-top:auto;margin-bottom:14px}
+.lock-hint{font:500 12px/1.4 var(--sans);letter-spacing:.02em;color:var(--fg2);margin:0 0 8px;min-height:18px;text-transform:lowercase}
 .slots{display:flex;align-items:flex-end;gap:7px;height:44px;font:600 34px/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .slots i{display:block;width:22px;height:40px;border-bottom:1.5px solid rgba(243,239,232,.3);font-style:normal;text-align:center;line-height:38px;transition:border-color .2s}
 .slots i.f{border-color:var(--fg)}
@@ -59,7 +59,7 @@ body:not(.locked) #hud{opacity:1}
 @keyframes pulse{50%{opacity:.3}}
 #lock.ok .slots i{border-color:var(--rose);color:var(--rose)}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(243,239,232,.14);border-left:1px solid rgba(243,239,232,.14)}
-.pad button,.pad-heart{height:clamp(56px,calc((100svh - 400px - var(--st) - var(--sb)) / 4),72px);border-right:1px solid rgba(243,239,232,.14);border-bottom:1px solid rgba(243,239,232,.14);display:grid;place-items:center;font:500 26px/1 var(--sans);letter-spacing:-.02em;transition:background .25s}
+.pad button,.pad-heart{height:clamp(44px,calc((100dvh - 390px - var(--st) - var(--sb)) / 4),64px);border-right:1px solid rgba(243,239,232,.14);border-bottom:1px solid rgba(243,239,232,.14);display:grid;place-items:center;font:500 26px/1 var(--sans);letter-spacing:-.02em;transition:background .25s}
 .pad button:active{background:rgba(243,239,232,.14);transition:none}
 .pad button.del{font-size:18px;color:var(--fg2)}
 .pad-heart{color:var(--rose);font-size:16px}
