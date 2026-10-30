@@ -110,16 +110,28 @@
     prepare();
     return els;
   }
+  // une seule image du début à la fin : la plongée s'arrête sur la photo, les phrases montent dessus,
+  // puis elles s'effacent vers le haut pendant que ILONA monte du bas. Aucune coupe entre deux écrans.
   async function reveal(els) {
     document.body.classList.remove('locked');
-    document.body.classList.add('reading');
     scrollTo(0, 0);
     const hero = $('.hero');
-    hero.classList.add('in');
-    $$('.hero .rv').forEach(el => el.classList.add('in'));
+    hero.classList.add('s1');
     lock.classList.add('gone');
     setTimeout(() => lock.remove(), 1600);
     (async () => { for (const el of els) { try { await loadEl(el); } catch (e) {} } })();
+    let skip = false;
+    const go = () => { skip = true; };
+    addEventListener('touchstart', go, { once: true, passive: true });
+    addEventListener('wheel', go, { once: true, passive: true });
+    const wait = async ms => { const t = performance.now(); while (!skip && performance.now() - t < ms) await sleep(50); };
+    const lines = $$('.hl', hero);
+    await wait(reduce ? 0 : 150);
+    for (const l of lines) { l.classList.add('on'); await wait(reduce ? 0 : 650); }
+    await wait(reduce ? 0 : 1900);
+    hero.classList.add('in');
+    $$('.hero .rv').forEach(el => el.classList.add('in'));
+    document.body.classList.add('reading');
     init(els);
   }
 
@@ -419,7 +431,7 @@
   function glfx() {
     if (!window.GL || !GL.supported) return;
     const hero = $('.hero'), hc = $('.glh', hero), hi = $('img[data-a]', hero);
-    if (hc && hi) loadEl(hi).then(() => { try { if (GL.liquid(hc, hi)) hero.classList.add('gl-on'); } catch (e) {} });
+    if (hc && hi) loadEl(hi).then(() => setTimeout(() => { try { if (GL.liquid(hc, hi)) requestAnimationFrame(() => hero.classList.add('gl-on')); } catch (e) {} }, 1600));
     $$('.bleed').forEach(bl => {
       const fig = $('.gld', bl), im = fig && $('img[data-a]', fig); if (!im) return;
       const c = document.createElement('canvas'); c.className = 'gld-c'; fig.after(c);
