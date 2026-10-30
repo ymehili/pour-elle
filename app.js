@@ -282,7 +282,7 @@
     const check = () => {
       gs.forEach((g, i) => { if (g.classList.contains('open')) { word[i].textContent = g.dataset.letter; word[i].classList.add('on'); } });
       const n = gs.filter(g => !g.classList.contains('open')).length;
-      if (left) left.textContent = n === 0 ? 'c’était annecy' : n === 1 ? 'plus qu’une' : `encore ${n} lettres`;
+      if (left) left.textContent = n === 0 ? '' : n === 1 ? 'plus qu’une' : `encore ${n} lettres`;
       if (!n && !sec.classList.contains('solved')) setTimeout(() => {
         sec.classList.add('solved');
         const an = $('.annecy', sec);
@@ -438,7 +438,7 @@
   function glfx() {
     if (!window.GL || !GL.supported) return;
     const hero = $('.hero'), hc = $('.glh', hero), hi = $('img[data-a]', hero);
-    if (hc && hi) loadEl(hi).then(() => setTimeout(() => { try { if (GL.liquid(hc, hi)) requestAnimationFrame(() => hero.classList.add('gl-on')); } catch (e) {} }, 1600));
+    
     $$('.bleed').forEach(bl => {
       const fig = $('.gld', bl), im = fig && $('img[data-a]', fig); if (!im) return;
       const c = document.createElement('canvas'); c.className = 'gld-c'; fig.after(c);
