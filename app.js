@@ -13,7 +13,6 @@
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   let mistFx = null;
-  try { if (window.GL && GL.supported) mistFx = GL.mist($('#mist'), { tint: [0.16, 0.25, 0.42], dark: [0.043, 0.055, 0.078] }); } catch (e) {}
 
   /* ---------------- clé du lien ---------------- */
   const frag = qp.get('k');
@@ -22,7 +21,7 @@
     $('.lock-mid').innerHTML = '<p class="broken">' + (!frag
       ? 'le lien est pas complet<br>ouvre le direct depuis mon message'
       : 'ouvre le dans safari') + '</p>';
-    $('.pre-ring').style.display = 'none';
+    $('#lock-say').style.display = 'none';
     return;
   }
   const contentP = fetch(CFG.content).then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); });
@@ -39,25 +38,21 @@
     } catch (e) { return null; }
   }
 
-  /* ---------------- chargement : le compteur avance pendant qu'on déchiffre ---------------- */
-  let preShown = 0, preTarget = 70;
-  {
-    const pn = $('[data-pre-n]'), pr = $('#lock .r1');
-    const loop = () => {
-      preShown += (preTarget - preShown) * .05;
-      pn.textContent = String(Math.round(preShown)).padStart(3, '0');
-      pr.style.strokeDashoffset = 289 * (1 - preShown / 365);
-      if (document.body.classList.contains('locked')) requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-  }
-  contentP.then(() => { preTarget = 150; }).catch(() => {});
-  let opened = null;
+  /* ---------------- ouverture : la bague (ring.js) ---------------- */
+  let preShown = 0, opened = null;
+  if (qp.get('c')) window.__ringOpen();
+  // secours si la 3D ne se lance pas : garder le doigt appuyé sur l'écran
+  setTimeout(() => {
+    if (window.__ringReady) return;
+    lock.classList.add('ready', 'flat');
+    let t = 0, timer = 0;
+    lock.addEventListener('pointerdown', () => { lock.classList.add('pressing'); t = performance.now(); timer = setTimeout(() => { lock.classList.add('done', 'through'); window.__ringOpen(); }, 1300); });
+    const up = () => { lock.classList.remove('pressing'); clearTimeout(timer); };
+    addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  }, 3500);
   (async () => {
-    await sleep(reduce ? 0 : 900);
-    const res = await tryCode('01112025');
+    const [res] = await Promise.all([tryCode('01112025'), window.__ringGate]);
     if (!res) { $('.lock-mid').innerHTML = '<p class="broken">le lien est pas complet<br>ouvre le direct depuis mon message</p>'; return; }
-    preTarget = 210;
     opened = open(res);
   })();
 

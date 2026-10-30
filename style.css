@@ -367,13 +367,26 @@ figure.pic.wide figcaption{padding-left:var(--g)}
 @media (min-width:600px){html{background:#000}}
 
 
-.pre-ring{position:absolute;left:50%;top:44%;width:168px;height:168px;margin:-84px 0 0 -84px}
-.pre-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.pre-ring circle{fill:none;stroke:var(--moon);stroke-width:.6}
-.pre-ring .r0{opacity:.22}
-.pre-ring .r1{stroke-dasharray:289;stroke-dashoffset:289}
-.pre-ring .intro-n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:400 52px/1 var(--disp);font-variant-numeric:tabular-nums;color:var(--moon)}
-.pre-ring .intro-n small{font:italic 400 16px var(--read);opacity:.75;margin-top:6px}
+:root{--rose:#E39AB1;--rose2:#C96F8E}
+#lock{background:radial-gradient(120% 80% at 50% 42%,#18203A 0%,#0B0E14 62%);touch-action:none} 
+#ring{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.6s ease}
+#lock.ready #ring{opacity:1}
+.lock-name{position:absolute;left:0;right:0;top:calc(var(--st) + 40px);text-align:center;font:italic 400 30px/1 var(--disp);color:var(--moon);opacity:.9;transition:opacity .6s}
+.lock-say{position:absolute;left:var(--g);right:var(--g);bottom:calc(var(--sb) + 56px);text-align:center;font:italic 400 19px/1.35 var(--read);color:rgba(236,230,216,.82);opacity:0;transition:opacity .8s 1s}
+#lock.ready .lock-say{opacity:1}
+.hold-ring{position:absolute;left:50%;bottom:calc(var(--sb) + 112px);width:54px;height:54px;margin-left:-27px;transform:rotate(-90deg);opacity:0;transition:opacity .4s}
+.hold-ring circle{fill:none;stroke:var(--rose);stroke-width:4;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:289}
+#lock.pressing .hold-ring{opacity:1}
+#lock.flat .hold-ring{opacity:1}
+#lock.flat.pressing .hold-arc{transition:stroke-dashoffset 1.3s linear;stroke-dashoffset:0}
+#lock.done .lock-name,#lock.done .lock-say,#lock.done .hold-ring{opacity:0!important;transition:opacity .4s}
+#lock.through::after{content:"";position:absolute;inset:0;background:var(--rose);opacity:0;animation:through 1.2s ease forwards}
+@keyframes through{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
 #lock .lock-mid{position:absolute;left:var(--g);right:var(--g);bottom:calc(var(--sb) + 60px);text-align:center}
-#lock.gone{opacity:0;transition:opacity .7s ease}
+#lock.gone{opacity:0;transition:opacity .9s ease}
 .intro-go{display:none!important}
+
+.yes em{color:var(--rose)}
+.ol{color:var(--rose2)!important}
+.hold .h1{stroke:var(--rose)!important}
+.finale.said{background:var(--rose2)!important}
