@@ -261,7 +261,7 @@
     const step = t => {
       const p = Math.min(1, (t - t0) / dur), v = Math.round(to * (1 - Math.pow(1 - p, 3)));
       el.textContent = fmt(v);
-      if (p < 1) requestAnimationFrame(step); else el.classList.add('full');
+      if (p < 1) requestAnimationFrame(step); else el.classList.add('counted');
     };
     requestAnimationFrame(step);
   }
