@@ -371,18 +371,11 @@
         hudDay.textContent = `jour ${n} · ${pad(dt.getUTCDate())}.${pad(dt.getUTCMonth() + 1)}.${dt.getUTCFullYear()}`;
         hudRing.style.strokeDashoffset = 138.2 * (1 - clamp(n / 365));
       }
-      // HUD : fond et texte selon ce qu'il recouvre
+      // HUD : pastille claire ou sombre selon ce qu'il recouvre
       {
-        const under = document.elementFromPoint(W / 2, 30);
-        const z = under && under.closest('.hero,.grow,.bleed,.pano,.finale,.night,.mosaic');
-        const mode = !z ? 'p' : (z.matches('.night,.finale') ? 'n' : (z.matches('.mosaic') ? 'p' : 'i'));
-        if (mode !== hudMode) {
-          hudMode = mode;
-          const hs = document.getElementById('hud').style;
-          if (mode === 'p') { hs.setProperty('--hb', document.body.style.backgroundColor || '#F1ECE3'); hs.setProperty('--hc', '#1A1613'); }
-          else if (mode === 'n') { hs.setProperty('--hb', '#0B0E14'); hs.setProperty('--hc', '#ECE6D8'); }
-          else { hs.setProperty('--hb', 'rgba(11,14,20,.42)'); hs.setProperty('--hc', '#ECE6D8'); }
-        } else if (mode === 'p') document.getElementById('hud').style.setProperty('--hb', document.body.style.backgroundColor || '#F1ECE3');
+        const under = document.elementFromPoint(W - 60, 26);
+        const dk = !!(under && under.closest('.hero,.grow,.bleed,.pano,.finale,.night'));
+        if (dk !== hudMode) { hudMode = dk; document.getElementById('hud').classList.toggle('dk', dk); }
       }
       // couleur d'ambiance
       if (!frozen) {
@@ -439,7 +432,7 @@
         }
       }
     };
-    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(run); } }, { passive: true });
+    let idle; addEventListener('scroll', () => { document.body.classList.add('moving'); clearTimeout(idle); idle = setTimeout(() => document.body.classList.remove('moving'), 700); if (!ticking) { ticking = true; requestAnimationFrame(run); } }, { passive: true });
     run();
   }
 
