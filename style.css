@@ -438,3 +438,8 @@ figure.pic.wide figcaption{padding-left:var(--g)}
 .hero.s1 .kb .ph-i img.ok{animation:kbin 16s var(--e-out) forwards}
 #lock.gone{opacity:0;transition:opacity 1.1s ease}
 #lock.through{opacity:1}
+
+
+.hero-name.hero-2{flex-direction:column;align-items:center;font-size:clamp(70px,21vw,96px);line-height:.9;letter-spacing:-.01em}
+.hero-name.hero-2 span{display:block;overflow:visible}
+.hero-name.hero-2 em{font-style:italic;font-size:1.12em;letter-spacing:0}
