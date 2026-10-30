@@ -118,12 +118,12 @@
     const hero = $('.hero');
     hero.classList.add('s1');
     lock.classList.add('gone');
-    setTimeout(() => lock.remove(), 1600);
+    setTimeout(() => lock.remove(), 2000);
     (async () => { for (const el of els) { try { await loadEl(el); } catch (e) {} } })();
     document.body.classList.add('seq');                // pas de scroll pendant la séquence
     const wait = ms => sleep(reduce ? 0 : ms);
     const lines = $$('.hl', hero);
-    await wait(1400);                                   // la photo respire d'abord, seule
+    await wait(2000);                                   // le fondu de la bague se termine, la photo respire seule
     hero.classList.add('dim');
     await wait(900);
     for (const l of lines) { l.classList.add('on'); await wait(1100); }
