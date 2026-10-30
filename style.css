@@ -396,3 +396,19 @@ figure.pic.wide figcaption{padding-left:var(--g)}
 .ol{color:var(--rose2)!important}
 .hold .h1{stroke:var(--rose)!important}
 .finale.said{background:var(--rose2)!important}
+
+
+.lock-count{position:absolute;left:50%;bottom:calc(var(--sb) + 92px);width:78px;height:78px;margin-left:-39px;opacity:0;transform:translateY(10px);transition:opacity .8s .3s,transform .8s var(--e-out) .3s}
+#lock.ready .lock-count{opacity:1;transform:none}
+.lock-count .hold-ring{position:absolute;inset:0;left:0;bottom:auto;width:100%;height:100%;margin:0;opacity:1!important;transform:rotate(-90deg)}
+.lock-count .hold-ring circle{stroke-width:2.6}
+.lock-count .hold-bg{stroke:rgba(236,230,216,.18)!important;stroke-dasharray:none!important}
+.lock-day{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:500 26px/1 var(--disp);font-variant-numeric:tabular-nums lining-nums;color:var(--moon)}
+.lock-day small{font:italic 400 12px var(--read);opacity:.7;margin-top:3px}
+.lock-say{bottom:calc(var(--sb) + 40px)!important;font-size:18px!important;min-height:24px}
+#lock.done .lock-count{opacity:0;transition:opacity .5s}
+#lock.through{opacity:0;transition:opacity .7s ease}
+
+.hero .kb .ph-i img.ok{animation:none}
+.hero.in .kb .ph-i img.ok{animation:kbin 14s var(--e-out) forwards}
+@keyframes kbin{from{transform:scale(1)}to{transform:scale(1.06)}}

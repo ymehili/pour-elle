@@ -54,9 +54,13 @@
     const res = await tryCode('01112025');
     if (!res) { $('.lock-mid').innerHTML = '<p class="broken">le lien est pas complet<br>ouvre le direct depuis mon message</p>'; return; }
     KEY = res.key; ASSETS = res.data.assets;
-    asset('hero').then(u => window.__heroSet && window.__heroSet(u)).catch(() => {});
+    const P = [['p7783', '2025-11-20', 'une des premières vidéos de toi'], ['p7853', '2025-12-31', 'notre premier nouvel an'],
+      ['p8063', '2026-02-14', 'chez moi'], ['p8951', '2026-05-01', 'saint-tropez'], ['p10015', '2026-06-27', 'annecy'],
+      ['p11080', '2026-07-27', 't’as dit oui'], ['hero', '2026-10-31', 'santorin']];
+    window.__photosSet(await Promise.all(P.map(([id, iso, label]) => asset(id).then(url => ({ url, iso, label })))));
+    const staged = stage(res);
     await window.__ringGate;
-    opened = open(res);
+    opened = staged.then(reveal);
   })();
 
   /* ---------------- médias chiffrés ---------------- */
@@ -94,23 +98,28 @@
   const DAY = 864e5;
   const daysNow = () => Math.max(0, Math.floor((Date.now() - START) / DAY));
 
-  async function open({ key, data }) {
+  // le site se prépare derrière la bague, pour que la fin de la plongée tombe pile sur le hero
+  async function stage({ key, data }) {
     KEY = key; ASSETS = data.assets;
     const story = $('#story');
     story.innerHTML = data.html;
+    const intro = $('#intro'); if (intro) intro.remove();
     const els = $$('[data-a]', story);
-    const introImg = $('#intro .intro-img');
-    await Promise.race([loadEl(introImg), sleep(4000)]);
-    document.body.classList.remove('locked');
-    document.body.classList.add('intro');
-    scrollTo(0, 0);
-    lock.classList.add('gone');
-    setTimeout(() => { if (mistFx) mistFx.stop(); lock.remove(); }, 1200);
-    // préchargement doux pendant l'intro
-    (async () => { for (const el of els) { try { await loadEl(el); } catch (e) {} } })();
+    await Promise.race([loadEl($('.hero img[data-a]')), sleep(5000)]);
     await (document.fonts ? document.fonts.ready : sleep(300));
     prepare();
-    await intro(introImg);
+    return els;
+  }
+  async function reveal(els) {
+    document.body.classList.remove('locked');
+    document.body.classList.add('reading');
+    scrollTo(0, 0);
+    const hero = $('.hero');
+    hero.classList.add('in');
+    $$('.hero .rv').forEach(el => el.classList.add('in'));
+    lock.classList.add('gone');
+    setTimeout(() => lock.remove(), 1600);
+    (async () => { for (const el of els) { try { await loadEl(el); } catch (e) {} } })();
     init(els);
   }
 
