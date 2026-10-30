@@ -17,12 +17,12 @@
 
   /* ---------------- clé du lien ---------------- */
   const frag = qp.get('k');
-  const lock = $('#lock'), slots = $('#slots'), hint = $('#hint');
+  const lock = $('#lock'), hint = $('#hint'), wheels = $('#wheels');
   if (!frag || !window.crypto || !crypto.subtle) {
     $('.lock-mid').innerHTML = '<p class="broken">' + (!frag
       ? 'le lien est pas complet<br>ouvre le direct depuis mon message'
       : 'ouvre le dans safari') + '</p>';
-    $('#pad').style.visibility = 'hidden';
+    wheels.style.visibility = 'hidden';
     return;
   }
   const contentP = fetch(CFG.content).then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); });
@@ -39,47 +39,75 @@
     } catch (e) { return null; }
   }
 
-  /* ---------------- clavier ---------------- */
-  let digits = '', busy = false, fails = 0;
+  /* ---------------- la roue du temps ---------------- */
+  const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const YEARS = [2024, 2025, 2026, 2027];
+  const IH = 64;
+  const cols = { d: $('[data-col="d"]'), m: $('[data-col="m"]'), y: $('[data-col="y"]') };
+  const fill = (col, items) => { col.innerHTML = items.map(t => `<span class="wi">${t}</span>`).join(''); col._it = $$('.wi', col); };
+  fill(cols.d, Array.from({ length: 31 }, (_, i) => i + 1));
+  fill(cols.m, MONTHS);
+  fill(cols.y, YEARS);
+  const idx = col => clamp(Math.round(col.scrollTop / IH), 0, col._it.length - 1);
+  const setIdx = (col, i, smooth) => col.scrollTo({ top: i * IH, behavior: smooth ? 'smooth' : 'auto' });
+  const pad2 = n => String(n).padStart(2, '0');
+  const current = () => pad2(idx(cols.d) + 1) + pad2(idx(cols.m) + 1) + YEARS[idx(cols.y)];
+  // on part d'aujourd'hui (heure de France) : à elle de remonter le temps
+  {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'Europe/Paris' }).formatToParts(new Date()).map(p => [p.type, +p.value]));
+    requestAnimationFrame(() => { setIdx(cols.d, parts.day - 1); setIdx(cols.m, parts.month - 1); setIdx(cols.y, Math.max(0, YEARS.indexOf(parts.year))); Object.values(cols).forEach(shade); });
+  }
+  function shade(col) {
+    const mid = col.scrollTop + col.clientHeight / 2;
+    col._it.forEach((it, i) => {
+      const d = (i * IH + IH / 2 + (col.clientHeight - IH) / 2 - mid) / IH;
+      const a = Math.abs(d);
+      if (a > 3.5) { it.style.opacity = 0; return; }
+      it.style.opacity = Math.max(0, 1 - a * .34).toFixed(3);
+      it.style.transform = `perspective(500px) rotateX(${(-d * 21).toFixed(1)}deg) scale(${(1 - a * .05).toFixed(3)})`;
+      it.classList.toggle('on', a < .5);
+    });
+  }
+  let digits = '', busy = false, fails = 0, lastTried = '', settle = 0;
   const hints = [
-    'mets la date où on a commencé à se parler',
+    'remonte jusqu’au jour où on a commencé à se parler',
     'non mdrrr réfléchis',
     'ilona sérieux ? c’est en novembre',
-    '01 11 2025 ptdrrr'
+    'le premier novembre de l’année dernière ptdrrr'
   ];
-  const dots = $$('i', slots);
-  const paint = () => dots.forEach((d, i) => { d.classList.toggle('f', i < digits.length); d.textContent = digits[i] || ''; });
+  const paint = () => { if (digits.length === 8) { setIdx(cols.d, +digits.slice(0, 2) - 1); setIdx(cols.m, +digits.slice(2, 4) - 1); setIdx(cols.y, YEARS.indexOf(+digits.slice(4))); Object.values(cols).forEach(shade); } };
 
   async function submit() {
+    if (busy) return;
     busy = true;
-    slots.classList.add('wait');
-    const [res] = await Promise.all([tryCode(digits), sleep(450)]);
-    slots.classList.remove('wait');
+    wheels.classList.add('wait');
+    const tried = digits;
+    const [res] = await Promise.all([tryCode(tried), sleep(250)]);
+    wheels.classList.remove('wait');
     if (!res) {
       fails++;
-      slots.classList.remove('shake'); void slots.offsetWidth; slots.classList.add('shake');
-      await sleep(520);
-      digits = ''; paint();
-      hint.textContent = hints[Math.min(fails, hints.length - 1)];
+      const h = hints[Math.min(Math.floor(fails / 3), hints.length - 1)];
+      if (hint.textContent !== h) { hint.classList.add('swap'); await sleep(250); hint.textContent = h; hint.classList.remove('swap'); }
       busy = false;
+      if (current() !== tried) { digits = current(); lastTried = digits; submit(); }
       return;
     }
-    try { sessionStorage.setItem('c', digits); } catch (e) {}
+    try { sessionStorage.setItem('c', tried); } catch (e) {}
+    if (navigator.vibrate) navigator.vibrate(18);
     await open(res);
   }
-
-  $('#pad').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b || busy) return;
-    const k = b.dataset.k;
-    if (k === 'del') digits = digits.slice(0, -1);
-    else if (digits.length < 8) digits += k;
-    paint();
-    if (digits.length === 8) submit();
-  });
-  addEventListener('keydown', e => {
-    if (busy || !document.body.classList.contains('locked')) return;
-    if (/^\d$/.test(e.key) && digits.length < 8) { digits += e.key; paint(); if (digits.length === 8) submit(); }
-    else if (e.key === 'Backspace') { digits = digits.slice(0, -1); paint(); }
+  Object.values(cols).forEach(col => {
+    let raf = 0;
+    col.addEventListener('scroll', () => {
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; shade(col); });
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        const c = current();
+        if (c === lastTried || document.body.classList.contains('intro') || !document.body.classList.contains('locked')) return;
+        lastTried = c; digits = c; submit();
+      }, 320);
+    }, { passive: true });
+    col.addEventListener('click', e => { const it = e.target.closest('.wi'); if (it) setIdx(col, col._it.indexOf(it), true); });
   });
 
   /* ---------------- médias chiffrés ---------------- */
