@@ -120,15 +120,15 @@
     lock.classList.add('gone');
     setTimeout(() => lock.remove(), 1600);
     (async () => { for (const el of els) { try { await loadEl(el); } catch (e) {} } })();
-    let skip = false;
-    const go = () => { skip = true; };
-    addEventListener('touchstart', go, { once: true, passive: true });
-    addEventListener('wheel', go, { once: true, passive: true });
-    const wait = async ms => { const t = performance.now(); while (!skip && performance.now() - t < ms) await sleep(50); };
+    document.body.classList.add('seq');                // pas de scroll pendant la séquence
+    const wait = ms => sleep(reduce ? 0 : ms);
     const lines = $$('.hl', hero);
-    await wait(reduce ? 0 : 150);
-    for (const l of lines) { l.classList.add('on'); await wait(reduce ? 0 : 650); }
-    await wait(reduce ? 0 : 1900);
+    await wait(1400);                                   // la photo respire d'abord, seule
+    hero.classList.add('dim');
+    await wait(900);
+    for (const l of lines) { l.classList.add('on'); await wait(1100); }
+    await wait(2200);
+    document.body.classList.remove('seq');
     hero.classList.add('in');
     $$('.hero .rv').forEach(el => el.classList.add('in'));
     document.body.classList.add('reading');
@@ -278,9 +278,16 @@
   function guards() {
     const sec = $('.riddle'); if (!sec) return;
     const gs = $$('.g', sec), word = $$('.word span', sec);
+    const left = $('.rd-left', sec);
     const check = () => {
       gs.forEach((g, i) => { if (g.classList.contains('open')) { word[i].textContent = g.dataset.letter; word[i].classList.add('on'); } });
-      if (gs.every(g => g.classList.contains('open'))) setTimeout(() => sec.classList.add('solved'), 600);
+      const n = gs.filter(g => !g.classList.contains('open')).length;
+      if (left) left.textContent = n === 0 ? 'c’était annecy' : n === 1 ? 'plus qu’une' : `encore ${n} lettres`;
+      if (!n && !sec.classList.contains('solved')) setTimeout(() => {
+        sec.classList.add('solved');
+        const an = $('.annecy', sec);
+        setTimeout(() => an.scrollIntoView({ behavior: 'smooth', block: 'start' }), 900);
+      }, 700);
     };
     gs.forEach(g => g.addEventListener('click', () => { g.classList.add('open'); check(); }));
     $('.reveal-all', sec).addEventListener('click', async () => {
@@ -336,7 +343,7 @@
     const measure = () => {
       anchors = $$('[data-date]', story).map(el => ({ y: top(el), d: Date.parse(el.dataset.date + 'T12:00:00Z') })).sort((a, b) => a.y - b.y);
       secs = [...story.children].filter(el => el.dataset && el.dataset.bg).map(el => ({ el, y: top(el), h: el.offsetHeight, bg: el.dataset.bg }));
-      domes = $$('.dome', story);
+      domes = [];
       grows = $$('[data-grow]', story).map(el => ({ el, fig: $('.gfig', el) }));
       nums = $$('.numeral', story);
       panos = $$('[data-pano]', story);
