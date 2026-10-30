@@ -368,20 +368,26 @@ figure.pic.wide figcaption{padding-left:var(--g)}
 
 
 :root{--rose:#E39AB1;--rose2:#C96F8E}
-#lock{background:radial-gradient(120% 80% at 50% 42%,#18203A 0%,#0B0E14 62%);touch-action:none} 
-#ring{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.6s ease}
-#lock.ready #ring{opacity:1}
-.lock-name{position:absolute;left:0;right:0;top:calc(var(--st) + 40px);text-align:center;font:italic 400 30px/1 var(--disp);color:var(--moon);opacity:.9;transition:opacity .6s}
-.lock-say{position:absolute;left:var(--g);right:var(--g);bottom:calc(var(--sb) + 56px);text-align:center;font:italic 400 19px/1.35 var(--read);color:rgba(236,230,216,.82);opacity:0;transition:opacity .8s 1s}
-#lock.ready .lock-say{opacity:1}
-.hold-ring{position:absolute;left:50%;bottom:calc(var(--sb) + 112px);width:54px;height:54px;margin-left:-27px;transform:rotate(-90deg);opacity:0;transition:opacity .4s}
-.hold-ring circle{fill:none;stroke:var(--rose);stroke-width:4;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:289}
-#lock.pressing .hold-ring{opacity:1}
+#lock{background:#07090E;touch-action:none;--warm:0}
+#lock::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 55% at 50% 46%,#1C2440 0%,rgba(7,9,14,0) 70%);pointer-events:none} 
+#lock .warm{position:absolute;inset:0;pointer-events:none;opacity:var(--warm);background:radial-gradient(80% 50% at 50% 48%,rgba(227,154,177,.38),rgba(201,111,142,.12) 45%,rgba(7,9,14,0) 75%)} 
+.lock-big{position:absolute;left:0;right:0;top:50%;transform:translateY(-58%);text-align:center;font:italic 400 clamp(150px,52vw,230px)/.8 var(--disp);font-variation-settings:"opsz" 96;color:rgba(236,230,216,.07);letter-spacing:-.02em;white-space:nowrap;pointer-events:none;transition:color 1s,transform 1.4s var(--e-out)}
+#lock.ready .lock-big{color:rgba(236,230,216,.1)}
+#lock.done .lock-big{transform:translateY(-58%) scale(1.25);color:rgba(236,230,216,0)}
+#ring{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1.2s ease}
+#ring.on{opacity:1}
+.lock-name{position:absolute;left:0;right:0;top:calc(var(--st) + 36px);text-align:center;font:400 13px/1 var(--read);letter-spacing:.42em;text-transform:uppercase;color:rgba(236,230,216,.75);padding-left:.42em;opacity:0;transition:opacity 1s .4s}
+#lock.ready .lock-name{opacity:1}
+.lock-say{position:absolute;left:var(--g);right:var(--g);bottom:calc(var(--sb) + 52px);text-align:center;font:italic 400 21px/1.3 var(--read);color:rgba(236,230,216,.9);opacity:0;transform:translateY(8px);transition:opacity .8s,transform .8s var(--e-out)}
+#lock.ready .lock-say{opacity:1;transform:none}
+.lock-say.swap{opacity:0!important}
+.hold-ring{position:absolute;left:50%;bottom:calc(var(--sb) + 108px);width:46px;height:46px;margin-left:-23px;transform:rotate(-90deg);opacity:0;transition:opacity .5s}
+.hold-ring circle{fill:none;stroke:var(--rose);stroke-width:5;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:289}
+#lock.step2 .hold-ring{opacity:.9}
 #lock.flat .hold-ring{opacity:1}
 #lock.flat.pressing .hold-arc{transition:stroke-dashoffset 1.3s linear;stroke-dashoffset:0}
 #lock.done .lock-name,#lock.done .lock-say,#lock.done .hold-ring{opacity:0!important;transition:opacity .4s}
-#lock.through::after{content:"";position:absolute;inset:0;background:var(--rose);opacity:0;animation:through 1.2s ease forwards}
-@keyframes through{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
+#lock.through{opacity:0;transition:opacity 1s ease .1s}
 #lock .lock-mid{position:absolute;left:var(--g);right:var(--g);bottom:calc(var(--sb) + 60px);text-align:center}
 #lock.gone{opacity:0;transition:opacity .9s ease}
 .intro-go{display:none!important}

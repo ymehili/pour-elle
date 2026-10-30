@@ -43,7 +43,7 @@
   if (qp.get('c')) window.__ringOpen();
   // secours si la 3D ne se lance pas : garder le doigt appuyé sur l'écran
   setTimeout(() => {
-    if (window.__ringReady) return;
+    if (window.__ringReady || document.querySelector('#ring.on')) return;
     lock.classList.add('ready', 'flat');
     let t = 0, timer = 0;
     lock.addEventListener('pointerdown', () => { lock.classList.add('pressing'); t = performance.now(); timer = setTimeout(() => { lock.classList.add('done', 'through'); window.__ringOpen(); }, 1300); });
@@ -51,8 +51,11 @@
     addEventListener('pointerup', up); addEventListener('pointercancel', up);
   }, 3500);
   (async () => {
-    const [res] = await Promise.all([tryCode('01112025'), window.__ringGate]);
+    const res = await tryCode('01112025');
     if (!res) { $('.lock-mid').innerHTML = '<p class="broken">le lien est pas complet<br>ouvre le direct depuis mon message</p>'; return; }
+    KEY = res.key; ASSETS = res.data.assets;
+    asset('hero').then(u => window.__heroSet && window.__heroSet(u)).catch(() => {});
+    await window.__ringGate;
     opened = open(res);
   })();
 
