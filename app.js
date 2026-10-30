@@ -17,12 +17,12 @@
 
   /* ---------------- clé du lien ---------------- */
   const frag = qp.get('k');
-  const lock = $('#lock'), hint = $('#hint'), wheels = $('#wheels');
+  const lock = $('#lock');
   if (!frag || !window.crypto || !crypto.subtle) {
     $('.lock-mid').innerHTML = '<p class="broken">' + (!frag
       ? 'le lien est pas complet<br>ouvre le direct depuis mon message'
       : 'ouvre le dans safari') + '</p>';
-    wheels.style.visibility = 'hidden';
+    $('.pre-ring').style.display = 'none';
     return;
   }
   const contentP = fetch(CFG.content).then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); });
@@ -39,76 +39,27 @@
     } catch (e) { return null; }
   }
 
-  /* ---------------- la roue du temps ---------------- */
-  const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-  const YEARS = [2024, 2025, 2026, 2027];
-  const IH = 64;
-  const cols = { d: $('[data-col="d"]'), m: $('[data-col="m"]'), y: $('[data-col="y"]') };
-  const fill = (col, items) => { col.innerHTML = items.map(t => `<span class="wi">${t}</span>`).join(''); col._it = $$('.wi', col); };
-  fill(cols.d, Array.from({ length: 31 }, (_, i) => i + 1));
-  fill(cols.m, MONTHS);
-  fill(cols.y, YEARS);
-  const idx = col => clamp(Math.round(col.scrollTop / IH), 0, col._it.length - 1);
-  const setIdx = (col, i, smooth) => col.scrollTo({ top: i * IH, behavior: smooth ? 'smooth' : 'auto' });
-  const pad2 = n => String(n).padStart(2, '0');
-  const current = () => pad2(idx(cols.d) + 1) + pad2(idx(cols.m) + 1) + YEARS[idx(cols.y)];
-  // on part d'aujourd'hui (heure de France) : à elle de remonter le temps
+  /* ---------------- chargement : le compteur avance pendant qu'on déchiffre ---------------- */
+  let preShown = 0, preTarget = 70;
   {
-    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'Europe/Paris' }).formatToParts(new Date()).map(p => [p.type, +p.value]));
-    requestAnimationFrame(() => { setIdx(cols.d, parts.day - 1); setIdx(cols.m, parts.month - 1); setIdx(cols.y, Math.max(0, YEARS.indexOf(parts.year))); Object.values(cols).forEach(shade); });
+    const pn = $('[data-pre-n]'), pr = $('#lock .r1');
+    const loop = () => {
+      preShown += (preTarget - preShown) * .05;
+      pn.textContent = String(Math.round(preShown)).padStart(3, '0');
+      pr.style.strokeDashoffset = 289 * (1 - preShown / 365);
+      if (document.body.classList.contains('locked')) requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
   }
-  function shade(col) {
-    const mid = col.scrollTop + col.clientHeight / 2;
-    col._it.forEach((it, i) => {
-      const d = (i * IH + IH / 2 + (col.clientHeight - IH) / 2 - mid) / IH;
-      const a = Math.abs(d);
-      if (a > 3.5) { it.style.opacity = 0; return; }
-      it.style.opacity = Math.max(0, 1 - a * .34).toFixed(3);
-      it.style.transform = `perspective(500px) rotateX(${(-d * 21).toFixed(1)}deg) scale(${(1 - a * .05).toFixed(3)})`;
-      it.classList.toggle('on', a < .5);
-    });
-  }
-  let digits = '', busy = false, fails = 0, lastTried = '', settle = 0;
-  const hints = [
-    'remonte jusqu’au jour où on a commencé à se parler',
-    'non mdrrr réfléchis',
-    'ilona sérieux ? c’est en novembre',
-    'le premier novembre de l’année dernière ptdrrr'
-  ];
-  const paint = () => { if (digits.length === 8) { setIdx(cols.d, +digits.slice(0, 2) - 1); setIdx(cols.m, +digits.slice(2, 4) - 1); setIdx(cols.y, YEARS.indexOf(+digits.slice(4))); Object.values(cols).forEach(shade); } };
-
-  async function submit() {
-    if (busy) return;
-    busy = true;
-    wheels.classList.add('wait');
-    const tried = digits;
-    const [res] = await Promise.all([tryCode(tried), sleep(250)]);
-    wheels.classList.remove('wait');
-    if (!res) {
-      fails++;
-      const h = hints[Math.min(Math.floor(fails / 3), hints.length - 1)];
-      if (hint.textContent !== h) { hint.classList.add('swap'); await sleep(250); hint.textContent = h; hint.classList.remove('swap'); }
-      busy = false;
-      if (current() !== tried) { digits = current(); lastTried = digits; submit(); }
-      return;
-    }
-    try { sessionStorage.setItem('c', tried); } catch (e) {}
-    if (navigator.vibrate) navigator.vibrate(18);
-    await open(res);
-  }
-  Object.values(cols).forEach(col => {
-    let raf = 0;
-    col.addEventListener('scroll', () => {
-      if (!raf) raf = requestAnimationFrame(() => { raf = 0; shade(col); });
-      clearTimeout(settle);
-      settle = setTimeout(() => {
-        const c = current();
-        if (c === lastTried || document.body.classList.contains('intro') || !document.body.classList.contains('locked')) return;
-        lastTried = c; digits = c; submit();
-      }, 320);
-    }, { passive: true });
-    col.addEventListener('click', e => { const it = e.target.closest('.wi'); if (it) setIdx(col, col._it.indexOf(it), true); });
-  });
+  contentP.then(() => { preTarget = 150; }).catch(() => {});
+  let opened = null;
+  (async () => {
+    await sleep(reduce ? 0 : 900);
+    const res = await tryCode('01112025');
+    if (!res) { $('.lock-mid').innerHTML = '<p class="broken">le lien est pas complet<br>ouvre le direct depuis mon message</p>'; return; }
+    preTarget = 210;
+    opened = open(res);
+  })();
 
   /* ---------------- médias chiffrés ---------------- */
   let KEY, ASSETS;
@@ -151,9 +102,7 @@
     story.innerHTML = data.html;
     const els = $$('[data-a]', story);
     const introImg = $('#intro .intro-img');
-    lock.classList.add('ok');
     await Promise.race([loadEl(introImg), sleep(4000)]);
-    await sleep(350);
     document.body.classList.remove('locked');
     document.body.classList.add('intro');
     scrollTo(0, 0);
@@ -174,13 +123,14 @@
     try { if (window.GL && GL.supported) fx = GL.focus($('.intro-gl', box), img, { exposure: true }); } catch (e) {}
     box.classList.add(fx ? 'gl' : 'nogl');
     const n = $('[data-intro-n]', box), ring = $('.r1', box);
-    const to = Math.min(365, daysNow()), dur = reduce ? 10 : 2600, t0 = performance.now();
+    const from = Math.round(preShown), to = Math.max(365, Math.min(365, daysNow())), dur = reduce ? 10 : 2400, t0 = performance.now();
     if (fx) fx.reveal(.55);
     await new Promise(res => {
       const step = t => {
         const p = clamp((t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
-        n.textContent = String(Math.round(to * e)).padStart(3, '0');
-        ring.style.strokeDashoffset = 289 * (1 - Math.min(1, to / 365) * e);
+        const v = from + (to - from) * e;
+        n.textContent = String(Math.round(v)).padStart(3, '0');
+        ring.style.strokeDashoffset = 289 * (1 - Math.min(1, v / 365));
         p < 1 ? requestAnimationFrame(step) : res();
       };
       requestAnimationFrame(step);
@@ -190,13 +140,7 @@
     if (fx) fx.reveal(1.25);
     const lines = $$('.il', box);
     for (const l of lines) { await sleep(reduce ? 0 : 700); l.classList.add('on'); }
-    await sleep(reduce ? 0 : 900);
-    const go = $('.intro-go', box);
-    go.classList.add('on');
-    await new Promise(res => {
-      go.addEventListener('click', res, { once: true });
-      if (qp.get('c')) setTimeout(res, 600);
-    });
+    await new Promise(res => { setTimeout(res, reduce ? 0 : 2400); box.addEventListener('click', res, { once: true }); });
     box.classList.add('out');
     document.body.classList.remove('intro');
     document.body.classList.add('reading');
@@ -483,11 +427,11 @@
   }
 
   /* ---------------- relecture / tests ---------------- */
-  const auto = c => { digits = c; paint(); submit().then(() => {
+  (async () => {
+    while (!opened) await sleep(100);
+    await opened;
     const y = +qp.get('y') || 0;
     if (y) setTimeout(() => scrollTo(0, y === 99999 ? document.documentElement.scrollHeight : y), 900);
     if (qp.get('yes')) setTimeout(() => { const f = $('.finale'); if (f && f._said) f._said(); }, 2600);
-  }); };
-  if (qp.get('c') && qp.get('c').length === 8) auto(qp.get('c'));
-  else try { const c = sessionStorage.getItem('c'); if (c && c.length === 8) auto(c); } catch (e) {}
+  })();
 })();
