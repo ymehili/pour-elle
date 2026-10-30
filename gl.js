@@ -152,5 +152,40 @@ window.GL = (() => {
     return { reveal() { target = 1.25; }, stop() { on = false; cancelAnimationFrame(raf); } };
   }
 
-  return { mist, liquid, stars, dissolve, supported: !!document.createElement('canvas').getContext('webgl') };
+  /* ---------- 5. Mise au point : flou + désaturé + sombre → net (intro, pleines pages) ---------- */
+  function focus(canvas, img, { exposure = false } = {}) {
+    const gl = ctx(canvas); if (!gl) return null;
+    const p = prog(gl, QUAD_VS, `precision mediump float;varying vec2 v;uniform sampler2D img;uniform float f;uniform float t;uniform vec2 r;uniform vec2 ir;uniform float ex;
+    float hash(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+    void main(){float ca=r.x/r.y,ia=ir.x/ir.y;vec2 uv=v-.5;if(ca>ia)uv.y*=ia/ca;else uv.x*=ca/ia;uv+=.5;uv.y=1.-uv.y;
+      float k=clamp(f,0.,1.);vec2 c=(uv-.5)*(1.+(1.-k)*.08)+.5;float rad=(1.-k)*.022;
+      vec3 col=texture2D(img,c).rgb*.2;
+      col+=texture2D(img,c+vec2(rad,0.)).rgb*.1;col+=texture2D(img,c-vec2(rad,0.)).rgb*.1;
+      col+=texture2D(img,c+vec2(0.,rad)).rgb*.1;col+=texture2D(img,c-vec2(0.,rad)).rgb*.1;
+      col+=texture2D(img,c+vec2(rad,rad)*.7).rgb*.1;col+=texture2D(img,c-vec2(rad,rad)*.7).rgb*.1;
+      col+=texture2D(img,c+vec2(rad,-rad)*.7).rgb*.1;col+=texture2D(img,c-vec2(rad,-rad)*.7).rgb*.1;
+      float g=dot(col,vec3(.299,.587,.114));col=mix(vec3(g),col,.25+.75*k);
+      if(ex>.5)col*=mix(.32,1.,k);
+      col+=(hash(v*r+t)-.5)*.06*(1.-k*.6);
+      gl_FragColor=vec4(col,1.);}`);
+    if (!p) return null; gl.useProgram(p); quad(gl, p);
+    const u = n => gl.getUniformLocation(p, n);
+    const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+    let k = 0, target = 0, raf, on = true, cb = null;
+    const t0 = performance.now();
+    const loop = () => { if (!on) return; k += (target - k) * (exposure ? .022 : .06); size(gl, canvas, 1);
+      gl.uniform1f(u('f'), reduce ? 1 : k); gl.uniform1f(u('t'), (performance.now() - t0) / 1000);
+      gl.uniform2f(u('r'), canvas.width, canvas.height); gl.uniform2f(u('ir'), img.naturalWidth, img.naturalHeight); gl.uniform1f(u('ex'), exposure ? 1 : 0);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (!exposure && target >= 1.2 && k > 1.0) { on = false; canvas.classList.add('done'); if (cb) cb(); const l = gl.getExtension('WEBGL_lose_context'); if (l) setTimeout(() => l.loseContext(), 100); return; }
+      raf = requestAnimationFrame(loop); };
+    loop();
+    return { reveal(tg = 1.25, done) { target = tg; cb = done || null; },
+      stop() { on = false; cancelAnimationFrame(raf); const l = gl.getExtension('WEBGL_lose_context'); if (l) l.loseContext(); } };
+  }
+
+  return { mist, liquid, stars, dissolve, focus, supported: !!document.createElement('canvas').getContext('webgl') };
 })();
